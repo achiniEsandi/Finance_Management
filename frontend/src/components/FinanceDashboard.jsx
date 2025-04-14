@@ -4,6 +4,7 @@ import axios from "axios";
 import AddTransaction from "./AddTransaction";
 import PaymentPortal from "./PaymentPortal";
 import PettyCashManagement from "./PettyCashManagement";
+import BalanceSheetForm from './BalanceSheetForm';
 import BalanceSheetList from "./BalanceSheetList";
 import BalanceSheetDetail from "./BalanceSheetDetail";
 
@@ -101,7 +102,7 @@ const FinanceDashboard = () => {
         )}
 
         {activeTab === "add-transaction" && <AddTransaction />}
-        {activeTab === "balance-sheet/:id" && <BalanceSheetDetail />}
+        {activeTab === "balance-sheet" && <BalanceSheetDetail />}
         {activeTab === "payment-portal" && <PaymentPortal />}
         {activeTab === "petty-cash" && <PettyCashManagement />}
       </div>

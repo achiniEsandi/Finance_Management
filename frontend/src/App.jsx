@@ -6,6 +6,7 @@ import BalanceSheetList from "./components/BalanceSheetList";
 import BalanceSheetDetail from "./components/BalanceSheetDetail";
 import BalanceSheetUpdate from "./components/BalanceSheetUpdate";
 import BalanceSheetPage from "./components/BalanceSheetPage";
+import BalanceSheetForm from './components/BalanceSheetForm';
 import PettyCashManagement from "./components/PettyCashManagement";
 import AddTransaction from "./components/AddTransaction";
 import PaymentPortal from "./components/PaymentPortal";
@@ -65,12 +66,11 @@ function App() {
               <Route path="add-transaction" element={<AddTransaction />} />
               <Route path="payment-portal" element={<PaymentPortal />} />
               <Route path="petty-cash" element={<PettyCashManagement />} />
-              
-              {/* Balance Sheet Routes */}
-                {/*<Route path="balance-sheets" element={<BalanceSheetList />} />*/}
-                <Route path="balance-sheet/:id" element={<BalanceSheetDetail />} />
-                {/*<Route path="balance-sheet/edit/:id" element={<BalanceSheetUpdate />} />
-                <Route path="balance-sheet-page" element={<BalanceSheetPage />} />*/}
+              <Route path="balance-sheet/:id" element={<BalanceSheetDetail />} />
+              <Route path="balance-sheets" element={<BalanceSheetList />} />
+              <Route path="balance-sheet/update/:id" element={<BalanceSheetUpdate />} />
+              <Route path="balance-sheet" element={<BalanceSheetForm />} />
+                
 
             </Route>
 
