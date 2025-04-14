@@ -83,6 +83,7 @@ const FinanceDashboard = () => {
         <div className="flex space-x-5 mb-4">
           <button className="bg-blue-500 text-white text-lg px-5 py-3 rounded-lg hover:bg-blue-600" onClick={() => setActiveTab("dashboard")}>Dashboard</button>
           <button className="bg-blue-500 text-white text-lg px-5 py-3 rounded-lg hover:bg-blue-600" onClick={() => setActiveTab("add-transaction")}>Add Transaction</button>
+          <button className="bg-blue-500 text-white text-lg px-5 py-3 rounded-lg hover:bg-blue-600" onClick={() => setActiveTab("add-balance-sheet")}>Add Balance Sheet</button>
           <button className="bg-blue-500 text-white text-lg px-5 py-3 rounded-lg hover:bg-blue-600" onClick={() => setActiveTab("balance-sheet")}>Balance Sheet</button>
           <button className="bg-blue-500 text-white text-lg px-5 py-3 rounded-lg hover:bg-blue-600" onClick={() => setActiveTab("payment-portal")}>Payment Portal</button>
           <button className="bg-blue-500 text-white text-lg px-5 py-3 rounded-lg hover:bg-blue-600" onClick={() => setActiveTab("petty-cash")}>Petty Cash</button>
@@ -103,6 +104,7 @@ const FinanceDashboard = () => {
 
         {activeTab === "add-transaction" && <AddTransaction />}
         {activeTab === "balance-sheet" && <BalanceSheetDetail />}
+        {activeTab === "add-balance-sheet" && <BalanceSheetForm />}
         {activeTab === "payment-portal" && <PaymentPortal />}
         {activeTab === "petty-cash" && <PettyCashManagement />}
       </div>

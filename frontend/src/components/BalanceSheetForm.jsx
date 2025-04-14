@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// Component for adding, displaying, updating, and deleting balance sheets
 const BalanceSheetForm = () => {
   const [balanceSheets, setBalanceSheets] = useState([]);
   const [formData, setFormData] = useState({
@@ -39,30 +39,43 @@ const BalanceSheetForm = () => {
     },
     description: "",
   });
-
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Fetch existing balance sheets
-    axios.get("/api/balance-sheets/all")
+    axios
+      .get("/api/balance-sheets/all")
       .then((response) => setBalanceSheets(response.data))
-      .catch((error) => console.error("Error fetching balance sheets:", error));
+      .catch((error) =>
+        console.error("Error fetching balance sheets:", error)
+      );
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+    const keys = name.split(".");
+
+    setFormData((prev) => {
+      let updated = { ...prev };
+      let current = updated;
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        current[keys[i]] = { ...current[keys[i]] };
+        current = current[keys[i]];
+      }
+
+      current[keys[keys.length - 1]] = value;
+      return updated;
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editMode) {
-      // Update existing balance sheet
-      axios.put(`/api/balance-sheets/update/${editId}`, formData)
+      axios
+        .put(`/api/balance-sheets/update/${editId}`, formData)
         .then((response) => {
           alert(response.data.message);
           setBalanceSheets(
@@ -72,16 +85,20 @@ const BalanceSheetForm = () => {
           );
           resetForm();
         })
-        .catch((error) => console.error("Error updating balance sheet:", error));
+        .catch((error) =>
+          console.error("Error updating balance sheet:", error)
+        );
     } else {
-      // Add new balance sheet
-      axios.post("/api/balance-sheets/add", formData)
+      axios
+        .post("/api/balance-sheets/add", formData)
         .then((response) => {
           alert(response.data.message);
           setBalanceSheets([response.data.balanceSheet, ...balanceSheets]);
           resetForm();
         })
-        .catch((error) => console.error("Error adding balance sheet:", error));
+        .catch((error) =>
+          console.error("Error adding balance sheet:", error)
+        );
     }
   };
 
@@ -93,12 +110,36 @@ const BalanceSheetForm = () => {
   };
 
   const handleDelete = (id) => {
-    axios.delete(`/api/balance-sheets/delete/${id}`)
+    axios
+      .delete(`/api/balance-sheets/delete/${id}`)
       .then((response) => {
         alert(response.data.message);
         setBalanceSheets(balanceSheets.filter((sheet) => sheet._id !== id));
       })
-      .catch((error) => console.error("Error deleting balance sheet:", error));
+      .catch((error) =>
+        console.error("Error deleting balance sheet:", error)
+      );
+  };
+
+  const handleDownload = (id) => {
+    const url = `/api/balance-sheets/pdf/${id}`;
+    axios
+      .get(url, {
+        responseType: "blob",
+        headers: { Accept: "application/pdf" },
+      })
+      .then((response) => {
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `balance-sheet-${id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) =>
+        console.error("Error downloading balance sheet:", error)
+      );
   };
 
   const resetForm = () => {
@@ -143,11 +184,12 @@ const BalanceSheetForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-5">
-      <h1 className="text-3xl font-bold text-center mb-6">Balance Sheet Form</h1>
+      <h1 className="text-3xl font-bold text-center mb-6">
+        Balance Sheet Form
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          {/* Assets */}
           <div>
             <h2 className="font-semibold text-xl">Assets</h2>
             <div className="space-y-2">
@@ -167,11 +209,9 @@ const BalanceSheetForm = () => {
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded"
               />
-              {/* More fields for assets... */}
             </div>
           </div>
 
-          {/* Liabilities */}
           <div>
             <h2 className="font-semibold text-xl">Liabilities</h2>
             <div className="space-y-2">
@@ -191,12 +231,10 @@ const BalanceSheetForm = () => {
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded"
               />
-              {/* More fields for liabilities... */}
             </div>
           </div>
         </div>
 
-        {/* Equity */}
         <div>
           <h2 className="font-semibold text-xl">Equity</h2>
           <div className="space-y-2">
@@ -216,7 +254,6 @@ const BalanceSheetForm = () => {
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded"
             />
-            {/* More fields for equity... */}
           </div>
         </div>
 
@@ -239,26 +276,53 @@ const BalanceSheetForm = () => {
       </form>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">Balance Sheets</h2>
+
       <div className="space-y-4">
         {balanceSheets.map((sheet) => (
-          <div key={sheet._id} className="p-4 border border-gray-300 rounded-lg">
-            <h3 className="font-semibold text-lg">Balance Sheet #{sheet._id}</h3>
-            <p><strong>Description:</strong> {sheet.description}</p>
-            <p><strong>Assets:</strong> {JSON.stringify(sheet.assets)}</p>
-            <p><strong>Liabilities:</strong> {JSON.stringify(sheet.liabilities)}</p>
-            <p><strong>Equity:</strong> {JSON.stringify(sheet.equity)}</p>
-            <div className="mt-2 space-x-2">
+          <div
+            key={sheet._id}
+            className="p-4 border border-gray-300 rounded-lg"
+          >
+            <h3 className="font-semibold text-lg">
+              Balance Sheet #{sheet._id}
+            </h3>
+            <p>
+              <strong>Description:</strong> {sheet.description}
+            </p>
+            <p>
+              <strong>Assets:</strong> {JSON.stringify(sheet.assets, null, 2)}
+            </p>
+            <p>
+              <strong>Liabilities:</strong>{" "}
+              {JSON.stringify(sheet.liabilities, null, 2)}
+            </p>
+            <p>
+              <strong>Equity:</strong> {JSON.stringify(sheet.equity, null, 2)}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                onClick={() => navigate(`/balance-sheet/${sheet._id}`)}
+                className="bg-indigo-500 text-white px-3 py-2 rounded hover:bg-indigo-600"
+              >
+                Display
+              </button>
               <button
                 onClick={() => handleEdit(sheet._id)}
-                className="bg-yellow-500 text-white p-2 rounded"
+                className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600"
               >
-                Edit
+                Update
               </button>
               <button
                 onClick={() => handleDelete(sheet._id)}
-                className="bg-red-600 text-white p-2 rounded"
+                className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
               >
                 Delete
+              </button>
+              <button
+                onClick={() => handleDownload(sheet._id)}
+                className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600"
+              >
+                Download
               </button>
             </div>
           </div>

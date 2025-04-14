@@ -66,10 +66,11 @@ function App() {
               <Route path="add-transaction" element={<AddTransaction />} />
               <Route path="payment-portal" element={<PaymentPortal />} />
               <Route path="petty-cash" element={<PettyCashManagement />} />
-              <Route path="balance-sheet/:id" element={<BalanceSheetDetail />} />
+              {/*<Route path="balance-sheet/:id" element={<BalanceSheetDetail />} />
               <Route path="balance-sheets" element={<BalanceSheetList />} />
-              <Route path="balance-sheet/update/:id" element={<BalanceSheetUpdate />} />
-              <Route path="balance-sheet" element={<BalanceSheetForm />} />
+              <Route path="balance-sheet/update/:id" element={<BalanceSheetUpdate />} />*/}
+              <Route path="add-balance-sheet" element={<BalanceSheetForm />} />
+              <Route path="*" element={<h2>404 - Page Not Found</h2>} />
                 
 
             </Route>
