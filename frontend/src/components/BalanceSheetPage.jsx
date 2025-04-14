@@ -1,61 +1,22 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const BalanceSheetPage = () => {
-  const [balanceSheet, setBalanceSheet] = useState({
-    assets: "",
-    liabilities: "",
-    equity: "",
-  });
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchBalanceSheet();
-  }, []);
-
-  // Fetch the balance sheet data
-  const fetchBalanceSheet = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/balance-sheet");
-      setBalanceSheet(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching balance sheet:", error);
-      setLoading(false);
-    }
-  };
-
-  // Navigate to update page
-  const handleUpdateClick = () => {
-    navigate("/update-balance-sheet");
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div className="container mt-4">
-      <h2>Balance Sheet Details</h2>
-      
-      <div className="card">
-        <div className="card-header">
-          <h5>Balance Sheet Overview</h5>
-        </div>
-        <div className="card-body">
-          <p><strong>Assets:</strong> LKR {balanceSheet.assets}</p>
-          <p><strong>Liabilities:</strong> LKR {balanceSheet.liabilities}</p>
-          <p><strong>Equity:</strong> LKR {balanceSheet.equity}</p>
-
-          <button
-            onClick={handleUpdateClick}
-            className="btn btn-primary mt-3"
-          >
-            Update Balance Sheet
-          </button>
-        </div>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6">Balance Sheet Management</h2>
+      <div className="flex flex-col gap-4">
+        <button onClick={() => navigate('/balance-sheets')} className="bg-blue-500 text-white px-4 py-2 rounded">
+          View Balance Sheets
+        </button>
+        <button onClick={() => navigate('/balance-sheets/add')} className="bg-green-500 text-white px-4 py-2 rounded">
+          Add New Balance Sheet
+        </button>
+        <button onClick={() => navigate('/balance-sheets/dashboard')} className="bg-gray-700 text-white px-4 py-2 rounded">
+          Finance Dashboard
+        </button>
       </div>
     </div>
   );

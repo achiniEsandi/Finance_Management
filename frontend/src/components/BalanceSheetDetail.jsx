@@ -1,50 +1,30 @@
-// src/components/BalanceSheetDetail.js
-/*import React, { useEffect, useState } from "react";
-import { fetchBalanceSheet } from "../api/balanceSheet"; // import API call
-import { useParams } from "react-router-dom"; // To get the ID from the URL
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const BalanceSheetDetail = () => {
-  const { id } = useParams(); // Get the ID from the URL
-  const [balanceSheet, setBalanceSheet] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { id } = useParams();
+  const [sheet, setSheet] = useState(null);
 
-  // Fetch balance sheet details on component mount
   useEffect(() => {
-    const getBalanceSheet = async () => {
-      try {
-        const data = await fetchBalanceSheet(id);
-        setBalanceSheet(data); // Set data in state
-      } catch (error) {
-        setError("Failed to load balance sheet");
-      } finally {
-        setLoading(false);
-      }
+    const fetchSheet = async () => {
+      const res = await axios.get(`/api/balance-sheets/${id}`);
+      setSheet(res.data);
     };
-
-    getBalanceSheet();
+    fetchSheet();
   }, [id]);
 
-  // Loading state
-  if (loading) return <div>Loading...</div>;
-
-  // Error state
-  if (error) return <div>{error}</div>;
+  if (!sheet) return <p className="p-6">Loading...</p>;
 
   return (
-    <div>
-      <h2>Balance Sheet Details</h2>
-      {balanceSheet && (
-        <div>
-          <p><strong>Date:</strong> {new Date(balanceSheet.date).toLocaleDateString()}</p>
-          <p><strong>Total Assets:</strong> {balanceSheet.totalAssets}</p>
-          <p><strong>Total Liabilities:</strong> {balanceSheet.totalLiabilities}</p>
-          <p><strong>Equity:</strong> {balanceSheet.equity}</p>
-          <p><strong>Description:</strong> {balanceSheet.description}</p>
-        </div>
-      )}
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Balance Sheet Detail</h2>
+      <p><strong>Title:</strong> {sheet.title}</p>
+      <p><strong>Date:</strong> {new Date(sheet.date).toLocaleDateString()}</p>
+      <p><strong>Assets:</strong> {sheet.assets}</p>
+      <p><strong>Liabilities:</strong> {sheet.liabilities}</p>
     </div>
   );
 };
 
-export default BalanceSheetDetail;*/
+export default BalanceSheetDetail;
