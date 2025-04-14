@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
@@ -15,7 +17,7 @@ const AddTransaction = () => {
         type: 'income',
         description: '',
         amount: '',
-        date: '',
+        date: null,
         specificDescription: '',
     });
 
@@ -41,12 +43,11 @@ const AddTransaction = () => {
     };
 
     // Date validation
-    const handleDateChange = (e) => {
-        const selectedDate = new Date(e.target.value);
+    const handleDateChange = (selectedDate) => {
         const today = new Date();
         const oneMonthAgo = new Date();
         oneMonthAgo.setMonth(today.getMonth() - 1);
-
+    
         if (selectedDate > today) {
             setErrorMessage('Date cannot be in the future.');
         } else if (selectedDate < oneMonthAgo) {
@@ -54,9 +55,10 @@ const AddTransaction = () => {
         } else {
             setErrorMessage('');
         }
-
-        setFormData({ ...formData, date: e.target.value });
+    
+        setFormData({ ...formData, date: selectedDate });
     };
+    
 
     // Handle form submission
     const handleSubmit = async (e) => {
@@ -204,14 +206,29 @@ const AddTransaction = () => {
                 />
 
                 {/* Date Input */}
-                <input
+                {/*<input
                     type="date"
                     name="date"
                     value={formData.date}
                     onChange={handleDateChange}
                     required
                     className="w-full p-3 border rounded-md shadow-sm"
+                />*/}
+
+                <DatePicker
+                    selected={formData.date}
+                    onChange={handleDateChange}
+                    maxDate={new Date()}
+                    minDate={(() => {
+                        const d = new Date();
+                        d.setMonth(d.getMonth() - 1);
+                        return d;
+                    })()}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Select a date"
+                    className="w-full p-3 border rounded-md shadow-sm"
                 />
+
 
                 {/* Error Message */}
                 {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
