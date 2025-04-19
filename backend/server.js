@@ -10,6 +10,8 @@ import profitLossRoutes from './routes/profitLossRoutes.js';
 import pettyCashRoutes from './routes/pettyCashRoutes.js';
 import salaryRoutes from './routes/salaryRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import quotationRoutes from './routes/quotationRoutes.js';
+import appointmentRoutes from "./routes/appointmentRoutes.js";
 //import transactionRoutes from './routes/transactionRoutes.js'
 
 dotenv.config();
@@ -24,6 +26,8 @@ app.use('/api/petty-cash', pettyCashRoutes);
 app.use("/api/finance", financeRoutes); // Use finance routes
 app.use("/api", financeRoutes);
 app.use('/api/salary', salaryRoutes);
+app.use('/api/quotations', quotationRoutes);
+app.use("/api/appointments", appointmentRoutes);
 //app.use("/api/transactions", transactionRoutes);
 
 
