@@ -1,6 +1,7 @@
-const express = require("express");
-const Appointment = require("../models/Appointment"); // Your Mongoose model
-const { createAppointment } = require("../controllers/appointmentController");
+// routes/appointmentRoutes.js
+import express from "express";
+import Appointment from "../models/Appointment.js"; // Ensure the .js extension is included
+import { createAppointment } from "../controllers/appointmentController.js"; // Also include .js
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ router.post("/book", createAppointment);
 
 // Fetch all appointments (For Admin)
 router.get("/", async (req, res) => {
-  console.log("GET /api/appointments request received"); // Debugging
+  console.log("GET /api/appointments request received");
   try {
     const appointments = await Appointment.find();
     res.status(200).json(appointments);
@@ -43,4 +44,4 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

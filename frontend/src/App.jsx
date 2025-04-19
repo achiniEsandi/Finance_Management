@@ -11,6 +11,8 @@ import PettyCashManagement from "./components/PettyCashManagement";
 import AddTransaction from "./components/AddTransaction";
 import PaymentPortal from "./components/PaymentPortal";
 import AdminDashboard from "./components/AdminDashboard";
+import QuotationDashboard from './components/QuotationDashboard';
+import QuotationHistory from './pages/QuotationHistory';
 
 function App() {
   return (
@@ -34,7 +36,7 @@ function App() {
               Employee Dashboard
             </Link>
             <Link to="/quotation-dashboard" className="list-group-item list-group-item-action text-dark">
-              Quotation History
+              Quotation Dashboard
             </Link>
             <Link to="/repair-dashboard" className="list-group-item list-group-item-action text-dark">
               Repair Job Requests
@@ -65,13 +67,14 @@ function App() {
 
             {/* Other Dashboards */}
             <Route path="/employee-dashboard" element={<h2>Employee Dashboard (Coming Soon)</h2>} />
-            <Route path="/quotation-dashboard" element={<h2>Quotation Dashboard (Coming Soon)</h2>} />
+            <Route path="/quotation-dashboard" element={<QuotationDashboard />} />
             <Route path="/service-dashboard" element={<h2>Service Appointments (Coming Soon)</h2>} />
             <Route path="/repair-dashboard" element={<h2>Repair Dashboard (Coming Soon)</h2>} />
             <Route path="/inventory-dashboard" element={<h2>Inventory Dashboard (Coming Soon)</h2>} />
             <Route path="/appointment-dashboard" element={<h2>Service Appointment Dashboard (Coming Soon)</h2>} />
 
             {/* 404 Fallback */}
+            <Route path="/quotation-history" element={<QuotationHistory />} />
             <Route path="*" element={<h2>404 - Page Not Found</h2>} />
           </Routes>
         </div>

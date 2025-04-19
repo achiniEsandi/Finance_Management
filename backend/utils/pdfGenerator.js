@@ -1,6 +1,6 @@
-const PDFDocument = require('pdfkit');
+import PDFDocument from 'pdfkit';  // Use import instead of require
 
-const generatePDF = (quotation) => {
+export const generatePDF = (quotation) => {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument();
     const buffers = [];
@@ -11,7 +11,6 @@ const generatePDF = (quotation) => {
     const logoPath = "images/logo.jpg"; // Adjust the path based on your project structure
     doc.image(logoPath, 50, 50, { width: 100 });
 
-
     // Add Letterhead
     doc.fontSize(20).text("Cosmo Exports Lanka (PVT) LTD", 50, 120, { align: "center" });
     doc.fontSize(12).text("496/1, Naduhena, Meegoda, Sri Lanka", { align: "center" });
@@ -21,8 +20,6 @@ const generatePDF = (quotation) => {
     // Report Title
     doc.fontSize(16).text("Quotation", { align: "center", underline: true });
     doc.moveDown(2);
-
-
 
     // Add content to the PDF
     doc.fontSize(14).text(`Customer: ${quotation.customerName}`);
@@ -41,5 +38,3 @@ const generatePDF = (quotation) => {
     doc.end();
   });
 };
-
-module.exports = { generatePDF };

@@ -1,5 +1,5 @@
-const Appointment = require('../models/Appointment');
-const nodemailer = require('nodemailer');
+import Appointment from '../models/Appointment.js';
+import nodemailer from 'nodemailer';
 
 // Function to send appointment confirmation email
 const sendConfirmationEmail = (email, name, date, slot) => {
@@ -67,4 +67,4 @@ const createAppointment = async (req, res) => {
   }
 };
 
-module.exports = { createAppointment };
+export { createAppointment };

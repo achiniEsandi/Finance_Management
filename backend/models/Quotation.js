@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const quotationSchema = new mongoose.Schema(
   {
@@ -22,11 +22,11 @@ const quotationSchema = new mongoose.Schema(
     totalAmount: { type: Number, required: true },
     status: { 
       type: String, 
-      enum: ['pending', 'Accepted', 'Rejected'], // ✅ All lowercase
-      default: 'pending' // ✅ Default value should match enum case
+      enum: ['pending', 'Accepted', 'Rejected'],
+      default: 'pending',
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Quotation', quotationSchema);
+export default mongoose.model('Quotation', quotationSchema);

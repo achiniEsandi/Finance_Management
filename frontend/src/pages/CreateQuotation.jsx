@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { TextField, Button, Grid, Typography, IconButton } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useNavigate } from 'react-router-dom';
 
 const CreateQuotation = () => {
@@ -349,7 +349,7 @@ const CreateQuotation = () => {
           <Button
             variant="contained"
             color="info"
-            onClick={() => navigate('/quotations')}
+            onClick={() => navigate('/quotation-history')}
           >
             View Quotation History
           </Button>

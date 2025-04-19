@@ -1,9 +1,9 @@
-const Quotation = require('../models/Quotation');
-const { generatePDF } = require('../utils/pdfGenerator');
-const nodemailer = require('nodemailer');
+import Quotation from '../models/Quotation.js';  // Make sure the .js extension is added
+import { generatePDF } from '../utils/pdfGenerator.js';  // Use import statement
+import nodemailer from 'nodemailer';
 
 // Create Quotation
-exports.createQuotation = async (req, res) => {
+export const createQuotation = async (req, res) => {
   try {
     const { customerName, customerEmail, vehicleNumber, items, repairs, discount } = req.body;
 
@@ -36,7 +36,7 @@ exports.createQuotation = async (req, res) => {
 };
 
 // Get all quotations
-exports.getQuotations = async (req, res) => {
+export const getQuotations = async (req, res) => {
   try {
     const quotations = await Quotation.find();
     res.status(200).json(quotations);
@@ -47,7 +47,7 @@ exports.getQuotations = async (req, res) => {
 };
 
 // Get a specific quotation by ID
-exports.getQuotationById = async (req, res) => {
+export const getQuotationById = async (req, res) => {
   try {
     const quotation = await Quotation.findById(req.params.id);
     if (!quotation) {
@@ -61,7 +61,7 @@ exports.getQuotationById = async (req, res) => {
 };
 
 // Delete a quotation by ID
-exports.deleteQuotation = async (req, res) => {
+export const deleteQuotation = async (req, res) => {
   try {
     const quotation = await Quotation.findByIdAndDelete(req.params.id);
     if (!quotation) {
@@ -75,7 +75,7 @@ exports.deleteQuotation = async (req, res) => {
 };
 
 // Send Quotation Email
-exports.sendQuotationEmail = async (req, res) => {
+export const sendQuotationEmail = async (req, res) => {
   try {
     const quotation = await Quotation.findById(req.params.id);
     if (!quotation) {
@@ -118,7 +118,7 @@ exports.sendQuotationEmail = async (req, res) => {
 };
 
 // Update status of a quotation (Pending -> Accepted/Rejected)
-exports.updateQuotationStatus = async (req, res) => {
+export const updateQuotationStatus = async (req, res) => {
   const { id } = req.params; // Get the quotation ID from the URL parameters
   const { status } = req.body; // Get the status from the request body
 
