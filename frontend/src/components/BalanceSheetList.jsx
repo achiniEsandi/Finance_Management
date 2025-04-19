@@ -1,59 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import { getAllSheets, deleteSheet, getPDF } from '../api/balanceSheetAPI';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
 
-const BalanceSheetList = () => {
+export default function BalanceSheetList() {
   const [sheets, setSheets] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchSheets();
+    fetch("http://localhost:5000/api/balance-sheet/all")
+      .then((res) => res.json())
+      .then((data) => setSheets(data))
+      .catch((err) => console.error(err));
   }, []);
 
-  const fetchSheets = async () => {
-    const res = await getAllSheets();
-    setSheets(res.data);
-  };
-
-  const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this balance sheet?")) {
-      await deleteSheet(id);
-      fetchSheets();
-    }
-  };
-
-  const downloadPDF = async () => {
-    const res = await getPDF();
-    const blob = new Blob([res.data], { type: 'application/pdf' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'BalanceSheetReport.pdf';
-    link.click();
-  };
-
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Balance Sheets</h2>
-      <button onClick={downloadPDF} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
-        Download PDF
-      </button>
-      <div className="grid gap-4">
-        {sheets.map((sheet) => (
-          <div key={sheet._id} className="bg-white p-4 shadow rounded flex justify-between items-center">
-            <div>
-              <h3 className="font-semibold">{sheet.title || 'Untitled Balance Sheet'}</h3>
-              <p className="text-gray-500">{new Date(sheet.date).toLocaleDateString()}</p>
+    <div className="mt-10 space-y-4">
+      <h2 className="text-xl font-bold">Balance Sheets</h2>
+      {sheets.length === 0 ? (
+        <p>No records found.</p>
+      ) : (
+        sheets.map((sheet) => (
+          <div
+            key={sheet._id}
+            className="border rounded p-4 bg-white shadow-sm"
+          >
+            <h3 className="font-semibold text-lg">{sheet.company}</h3>
+            <p className="text-sm text-gray-500">Date: {sheet.date}</p>
+            <div className="mt-2">
+              <strong>Assets:</strong>
+              <ul className="list-disc pl-6">
+                {sheet.assets.map((a, i) => (
+                  <li key={i}>
+                    {a.name}: ${a.amount}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="space-x-2">
-              <button onClick={() => navigate(`/balance-sheets/${sheet._id}`)} className="text-blue-600">View</button>
-              <button onClick={() => navigate(`/balance-sheets/edit/${sheet._id}`)} className="text-yellow-600">Edit</button>
-              <button onClick={() => handleDelete(sheet._id)} className="text-red-600">Delete</button>
+            <div className="mt-2">
+              <strong>Liabilities:</strong>
+              <ul className="list-disc pl-6">
+                {sheet.liabilities.map((l, i) => (
+                  <li key={i}>
+                    {l.name}: ${l.amount}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
   );
-};
-
-export default BalanceSheetList;
+}
