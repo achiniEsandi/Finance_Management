@@ -7,41 +7,79 @@ export default function BalanceSheetList() {
     fetch("http://localhost:5000/api/balance-sheet/all")
       .then((res) => res.json())
       .then((data) => setSheets(data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Error fetching balance sheets:", err));
   }, []);
 
+  const renderItems = (items = []) =>
+    items.length > 0 ? (
+      <ul className="list-disc pl-6 text-sm text-gray-700">
+        {items.map((item, i) => (
+          <li key={i}>
+            {item.name || "Unnamed"}: ${item.amount || 0}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="text-sm text-gray-400">No data</p>
+    );
+
   return (
-    <div className="mt-10 space-y-4">
-      <h2 className="text-xl font-bold">Balance Sheets</h2>
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">📄 Balance Sheets</h2>
+
       {sheets.length === 0 ? (
-        <p>No records found.</p>
+        <p className="text-gray-500">No records found.</p>
       ) : (
         sheets.map((sheet) => (
           <div
             key={sheet._id}
-            className="border rounded p-4 bg-white shadow-sm"
+            className="border rounded-lg p-5 bg-white shadow space-y-4"
           >
-            <h3 className="font-semibold text-lg">{sheet.company}</h3>
-            <p className="text-sm text-gray-500">Date: {sheet.date}</p>
-            <div className="mt-2">
-              <strong>Assets:</strong>
-              <ul className="list-disc pl-6">
-                {sheet.assets.map((a, i) => (
-                  <li key={i}>
-                    {a.name}: ${a.amount}
-                  </li>
-                ))}
-              </ul>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-blue-700">
+                {sheet.company || "Unnamed Company"}
+              </h3>
+              <p className="text-sm text-gray-500">📅 {sheet.date}</p>
             </div>
-            <div className="mt-2">
-              <strong>Liabilities:</strong>
-              <ul className="list-disc pl-6">
-                {sheet.liabilities.map((l, i) => (
-                  <li key={i}>
-                    {l.name}: ${l.amount}
-                  </li>
-                ))}
-              </ul>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Assets */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-700 mb-2">
+                  Assets
+                </h4>
+                <div>
+                  <p className="font-medium text-gray-600">Current</p>
+                  {renderItems(sheet.assets?.current)}
+                </div>
+                <div className="mt-2">
+                  <p className="font-medium text-gray-600">Non-Current</p>
+                  {renderItems(sheet.assets?.nonCurrent)}
+                </div>
+              </div>
+
+              {/* Liabilities */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-700 mb-2">
+                  Liabilities
+                </h4>
+                <div>
+                  <p className="font-medium text-gray-600">Current</p>
+                  {renderItems(sheet.liabilities?.current)}
+                </div>
+                <div className="mt-2">
+                  <p className="font-medium text-gray-600">Non-Current</p>
+                  {renderItems(sheet.liabilities?.nonCurrent)}
+                </div>
+              </div>
+
+              {/* Equity */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-700 mb-2">
+                  Equity
+                </h4>
+                {renderItems(sheet.equity)}
+              </div>
             </div>
           </div>
         ))

@@ -5,6 +5,7 @@ import {
   updateBalanceSheet,
   deleteBalanceSheet,
   generateBalanceSheetPDF,
+  getBalanceSheetById,
 } from "../controllers/balanceSheetController.js";
 
 const router = express.Router();
@@ -14,6 +15,9 @@ router.post("/add", addBalanceSheet);
 
 // 📌 Get All Balance Sheets
 router.get("/all", getBalanceSheets);
+
+// 📌 Get Balance Sheet by ID (New Route)
+router.get("/:id", getBalanceSheetById); // This route is for fetching a single balance sheet by its ID
 
 // 📌 Update Balance Sheet by ID
 router.put("/update/:id", updateBalanceSheet);

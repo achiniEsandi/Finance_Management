@@ -158,3 +158,19 @@ export const generateBalanceSheetPDF = async (req, res) => {
     }
 };
 
+
+// 📌 Get Balance Sheet by ID
+export const getBalanceSheetById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const balanceSheet = await BalanceSheet.findById(id);  // Use the correct model method to fetch by ID
+    if (!balanceSheet) {
+      return res.status(404).json({ message: "Balance Sheet not found" });
+    }
+    res.json(balanceSheet);
+  } catch (error) {
+    console.error("Error fetching balance sheet by ID:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
