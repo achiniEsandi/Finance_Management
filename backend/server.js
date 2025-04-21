@@ -22,7 +22,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/balance-sheet', balanceSheetRoutes);
 //app.use('/api/bank-book', bankBookRoutes);
 app.use('/api/profit-loss', profitLossRoutes);
-app.use('/api/petty-cash', pettyCashRoutes);
+//app.use('/api/petty-cash', pettyCashRoutes);
+app.use('/api/pettycash', pettyCashRoutes);
 app.use("/api/finance", financeRoutes); // Use finance routes
 app.use("/api", financeRoutes);
 app.use('/api/salary', salaryRoutes);
