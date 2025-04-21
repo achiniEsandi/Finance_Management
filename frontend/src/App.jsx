@@ -107,7 +107,7 @@ function App() {
             {/* Balance Sheet Central Page */}
             <Route
               path="/finance-dashboard/balance-sheet"
-              element={<BalanceSheetPage />}
+              element={<BalanceSheetForm />}
             />
             <Route path="/balance-sheets/add" element={<AddBalanceSheetPage />} />
 

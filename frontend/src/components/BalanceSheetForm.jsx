@@ -1,91 +1,92 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 
-const BalanceSheetForm = ({ onSubmit }) => {
-  const [formData, setFormData] = useState({
-    assets: {
-      currentAssets: [
-        { label: 'Cash/Bank Balances', value: '' },
-        { label: 'Accounts Receivable', value: '' },
-        { label: 'Inventory', value: '' },
-        { label: 'Prepaid Expenses', value: '' },
-      ],
-      nonCurrentAssets: [
-        { label: 'Property, Plant & Equipment', value: '' },
-        { label: 'Machinery & Tools', value: '' },
-        { label: 'Vehicles', value: '' },
-        { label: 'Intangible Assets', value: '' },
-      ],
-    },
-    liabilities: {
-      currentLiabilities: [
-        { label: 'Accounts Payable', value: '' },
-        { label: 'Short Term Loans', value: '' },
-        { label: 'Taxes Payable', value: '' },
-        { label: 'Wages Payable', value: '' },
-      ],
-      nonCurrentLiabilities: [
-        { label: 'Long Term Loans', value: '' },
-        { label: 'Lease Obligations', value: '' },
-        { label: 'Deferred Tax Liabilities', value: '' },
-      ],
-    },
-    equity: [
-      { label: "Owner's Capital", value: '' },
-      { label: 'Retained Earnings', value: '' },
-      { label: 'Shareholder Contributions', value: '' },
+const initialFormState = {
+  assets: {
+    currentAssets: [
+      { label: 'Cash/Bank Balances', value: '' },
+      { label: 'Accounts Receivable', value: '' },
+      { label: 'Inventory', value: '' },
+      { label: 'Prepaid Expenses', value: '' },
     ],
-    description: '',
-    date: new Date().toISOString().split('T')[0],
-  });
+    nonCurrentAssets: [
+      { label: 'Property, Plant & Equipment', value: '' },
+      { label: 'Machinery & Tools', value: '' },
+      { label: 'Vehicles', value: '' },
+      { label: 'Intangible Assets', value: '' },
+    ],
+  },
+  liabilities: {
+    currentLiabilities: [
+      { label: 'Accounts Payable', value: '' },
+      { label: 'Short Term Loans', value: '' },
+      { label: 'Taxes Payable', value: '' },
+      { label: 'Wages Payable', value: '' },
+    ],
+    nonCurrentLiabilities: [
+      { label: 'Long Term Loans', value: '' },
+      { label: 'Lease Obligations', value: '' },
+      { label: 'Deferred Tax Liabilities', value: '' },
+    ],
+  },
+  equity: [
+    { label: "Owner's Capital", value: '' },
+    { label: 'Retained Earnings', value: '' },
+    { label: 'Shareholder Contributions', value: '' },
+  ],
+  description: '',
+  date: new Date().toISOString().split('T')[0],
+};
 
-  const handleChange = (e, section, category, index) => {
-    const { name, value } = e.target;
-    if (e.target.type === 'number' && value < 0) return;
+const BalanceSheetForm = () => {
+  const [formData, setFormData] = useState(initialFormState);
 
-    setFormData((prev) => {
-      const updated = { ...prev };
-      if (section === 'assets' || section === 'liabilities') {
-        updated[section][category][index].value = value;
-      } else if (section === 'equity') {
-        updated[section][index].value = value;
-      } else {
-        updated[name] = value;
-      }
-      return updated;
-    });
+  const handleChange = (section, type, index, value) => {
+    if (value < 0) return; // Prevent negative amounts
+    const updated = { ...formData };
+    if (section === 'equity') {
+      updated.equity[index].value = value;
+    } else {
+      updated[section][type][index].value = value;
+    }
+    setFormData(updated);
   };
 
-  const handleAddField = (section, category) => {
+  const handleLabelChange = (section, type, index, value) => {
+    const updated = { ...formData };
+    if (section === 'equity') {
+      updated.equity[index].label = value;
+    } else {
+      updated[section][type][index].label = value;
+    }
+    setFormData(updated);
+  };
+
+  const addField = (section, type) => {
+    const updated = { ...formData };
     const newField = { label: '', value: '' };
-    setFormData((prev) => {
-      const updated = { ...prev };
-      if (category) {
-        updated[section][category].push(newField);
-      } else {
-        updated[section].push(newField);
-      }
-      return updated;
-    });
+    if (section === 'equity') {
+      updated.equity.push(newField);
+    } else {
+      updated[section][type].push(newField);
+    }
+    setFormData(updated);
   };
 
-  const handleRemoveField = (section, category, index) => {
-    setFormData((prev) => {
-      const updated = { ...prev };
-      if (category) {
-        updated[section][category] = updated[section][category].filter((_, i) => i !== index);
-      } else {
-        updated[section] = updated[section].filter((_, i) => i !== index);
-      }
-      return updated;
-    });
+  const removeField = (section, type, index) => {
+    const updated = { ...formData };
+    if (section === 'equity') {
+      if (updated.equity.length > 1) updated.equity.splice(index, 1);
+    } else {
+      if (updated[section][type].length > 1) updated[section][type].splice(index, 1);
+    }
+    setFormData(updated);
   };
 
-  const calculateTotal = (items) => {
-    return items.reduce((sum, item) => {
-      const val = parseFloat(item.value) || 0;
-      return sum + val;
-    }, 0).toFixed(2);
+  const handleTextChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -94,160 +95,192 @@ const BalanceSheetForm = ({ onSubmit }) => {
       alert('Please enter a description');
       return;
     }
-
+  
     try {
-      if (typeof onSubmit === 'function') {
-        await onSubmit(formData);
-      } else {
-        throw new Error('Submit handler not provided');
+      const response = await fetch('http://localhost:5000/api/balance-sheet/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Submission failed');
       }
+  
+      alert('Balance sheet submitted successfully!');
+      
+      // Reset form data
+      setFormData({
+        assets: {
+          currentAssets: [
+            { label: 'Cash/Bank Balances', value: '' },
+            { label: 'Accounts Receivable', value: '' },
+            { label: 'Inventory', value: '' },
+            { label: 'Prepaid Expenses', value: '' },
+          ],
+          nonCurrentAssets: [
+            { label: 'Property, Plant & Equipment', value: '' },
+            { label: 'Machinery & Tools', value: '' },
+            { label: 'Vehicles', value: '' },
+            { label: 'Intangible Assets', value: '' },
+          ],
+        },
+        liabilities: {
+          currentLiabilities: [
+            { label: 'Accounts Payable', value: '' },
+            { label: 'Short Term Loans', value: '' },
+            { label: 'Taxes Payable', value: '' },
+            { label: 'Wages Payable', value: '' },
+          ],
+          nonCurrentLiabilities: [
+            { label: 'Long Term Loans', value: '' },
+            { label: 'Lease Obligations', value: '' },
+            { label: 'Deferred Tax Liabilities', value: '' },
+          ],
+        },
+        equity: [
+          { label: "Owner's Capital", value: '' },
+          { label: 'Retained Earnings', value: '' },
+          { label: 'Shareholder Contributions', value: '' },
+        ],
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+      });
     } catch (err) {
-      console.error(err);
-      alert(err.message || 'Submission failed');
+      console.error('Error submitting balance sheet:', err);
+      alert('Failed to submit balance sheet');
     }
   };
+  
 
-  const renderInputList = (section, category) => (
-    <>
-      {formData[section][category].map((item, index) => (
-        <div key={index} className="flex gap-3 mb-2 items-center">
+  const renderFields = (section, type, fields) => (
+    <div className="mb-6 p-4 border rounded-md bg-gray-50">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold">{type.replace(/([A-Z])/g, ' $1')}</h3>
+        <button
+          type="button"
+          onClick={() => addField(section, type)}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          + Add Field
+        </button>
+      </div>
+      {fields.map((item, index) => (
+        <div key={index} className="grid grid-cols-12 gap-2 items-center mb-2">
           <input
             type="text"
             placeholder="Label"
+            className="col-span-5 p-2 border rounded"
             value={item.label}
-            onChange={(e) => handleChange(e, section, category, index)}
-            className="flex-1 px-3 py-2 border rounded-lg shadow-sm"
+            onChange={(e) => handleLabelChange(section, type, index, e.target.value)}
           />
           <input
             type="number"
-            placeholder="Amount"
+            className="col-span-5 p-2 border rounded"
             value={item.value}
-            onChange={(e) => handleChange(e, section, category, index)}
-            className="w-32 px-3 py-2 border rounded-lg shadow-sm"
-            min="0"
-            step="0.01"
+            onChange={(e) => handleChange(section, type, index, e.target.value)}
+            min={0}
           />
           <button
             type="button"
-            onClick={() => handleRemoveField(section, category, index)}
-            className="text-red-500 hover:text-red-700"
+            onClick={() => removeField(section, type, index)}
+            className="col-span-2 text-red-600 hover:underline"
           >
-            ×
+            Remove
           </button>
         </div>
       ))}
-      <button
-        type="button"
-        onClick={() => handleAddField(section, category)}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded shadow text-sm"
-      >
-        ➕ Add Field
-      </button>
-      <div className="mt-2 text-right font-medium">
-        Total: ${calculateTotal(formData[section][category])}
-      </div>
-    </>
+    </div>
   );
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow space-y-6"
+      className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg space-y-6"
     >
-      <h2 className="text-2xl font-bold text-center text-gray-800">
-        Add Balance Sheet
-      </h2>
+      <h2 className="text-2xl font-bold text-center">Balance Sheet Entry</h2>
 
-      {/* Description and Date */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <input
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={(e) => handleChange(e)}
-            placeholder="Balance Sheet Description"
-            className="w-full px-4 py-2 border rounded-lg shadow-sm"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={(e) => handleChange(e)}
-            className="w-full px-4 py-2 border rounded-lg shadow-sm"
-            required
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Description</label>
+        <input
+          type="text"
+          className="w-full p-2 border rounded"
+          value={formData.description}
+          onChange={(e) => handleTextChange('description', e.target.value)}
+        />
       </div>
 
-      {/* Assets Section */}
-      <section className="bg-gray-50 p-5 rounded-lg shadow-sm space-y-4">
-        <h3 className="text-xl font-semibold text-gray-700">Assets</h3>
-        <div>
-          <h4 className="text-md font-medium text-gray-600 mb-2">Current Assets</h4>
-          {renderInputList('assets', 'currentAssets')}
-        </div>
-        <div>
-          <h4 className="text-md font-medium text-gray-600 mb-2">Non-Current Assets</h4>
-          {renderInputList('assets', 'nonCurrentAssets')}
-        </div>
-      </section>
+      <div>
+        <label className="block text-sm font-medium mb-1">Date</label>
+        <input
+          type="date"
+          className="w-full p-2 border rounded"
+          value={formData.date}
+          onChange={(e) => handleTextChange('date', e.target.value)}
+        />
+      </div>
 
-      {/* Liabilities Section */}
-      <section className="bg-gray-50 p-5 rounded-lg shadow-sm space-y-4">
-        <h3 className="text-xl font-semibold text-gray-700">Liabilities</h3>
-        <div>
-          <h4 className="text-md font-medium text-gray-600 mb-2">Current Liabilities</h4>
-          {renderInputList('liabilities', 'currentLiabilities')}
-        </div>
-        <div>
-          <h4 className="text-md font-medium text-gray-600 mb-2">Non-Current Liabilities</h4>
-          {renderInputList('liabilities', 'nonCurrentLiabilities')}
-        </div>
-      </section>
+      <div>
+        <h2 className="text-xl font-bold mb-2">Assets</h2>
+        {renderFields('assets', 'currentAssets', formData.assets.currentAssets)}
+        {renderFields('assets', 'nonCurrentAssets', formData.assets.nonCurrentAssets)}
+      </div>
 
-      {/* Equity Section */}
-      <section className="bg-gray-50 p-5 rounded-lg shadow-sm space-y-4">
-        <h3 className="text-xl font-semibold text-gray-700">Equity</h3>
+      <div>
+        <h2 className="text-xl font-bold mb-2">Liabilities</h2>
+        {renderFields('liabilities', 'currentLiabilities', formData.liabilities.currentLiabilities)}
+        {renderFields('liabilities', 'nonCurrentLiabilities', formData.liabilities.nonCurrentLiabilities)}
+      </div>
+
+      <div className="p-4 border rounded-md bg-gray-50">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-bold">Equity</h2>
+          <button
+            type="button"
+            onClick={() => addField('equity')}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            + Add Equity
+          </button>
+        </div>
         {formData.equity.map((item, index) => (
-          <div key={index} className="flex gap-3 mb-2 items-center">
+          <div key={index} className="grid grid-cols-12 gap-2 items-center mb-2">
             <input
               type="text"
-              placeholder="Label"
+              className="col-span-5 p-2 border rounded"
               value={item.label}
-              onChange={(e) => handleChange(e, 'equity', null, index)}
-              className="flex-1 px-3 py-2 border rounded-lg shadow-sm"
+              placeholder="Label"
+              onChange={(e) => handleLabelChange('equity', null, index, e.target.value)}
             />
             <input
               type="number"
-              placeholder="Amount"
+              className="col-span-5 p-2 border rounded"
               value={item.value}
-              onChange={(e) => handleChange(e, 'equity', null, index)}
-              className="w-32 px-3 py-2 border rounded-lg shadow-sm"
-              min="0"
-              step="0.01"
+              onChange={(e) => handleChange('equity', null, index, e.target.value)}
+              min={0}
             />
+            <button
+              type="button"
+              onClick={() => removeField('equity', null, index)}
+              className="col-span-2 text-red-600 hover:underline"
+            >
+              Remove
+            </button>
           </div>
         ))}
-      </section>
+      </div>
 
-      <button
-        type="submit"
-        className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700"
-      >
-        Submit Balance Sheet
-      </button>
+      <div className="text-center">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Submit Balance Sheet
+        </button>
+      </div>
     </form>
   );
-};
-
-BalanceSheetForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
 };
 
 export default BalanceSheetForm;

@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 
 const transactionSchema = new mongoose.Schema({
-  type: { type: String, enum: ["income", "expense", "salary", "sales"], required: true },
+  source: { type: String, enum: ['manual', 'pettycash', 'inventory'], required: true },
+  type: { type: String, enum: ['income', 'expense'], required: true },
   amount: { type: Number, required: true },
-  description: { type: String },
-  timestamp: { type: Date, default: Date.now }, // Automatically stores the current date & time
-  //date: { type: Date, default: Date.now },
-  approved: { type: Boolean, default: false },
+  description: String,
+  timestamp: { type: Date, default: Date.now },
+  category: String, // e.g., "Sales", "Supplies", "Maintenance", etc.
 });
+
 
 
 /*const transactionSchema = new mongoose.Schema({
