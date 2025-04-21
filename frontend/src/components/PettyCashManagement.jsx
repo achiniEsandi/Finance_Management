@@ -9,6 +9,7 @@ const PettyCashManagement = () => {
     amount: "",
     description: "",
     transactionDate: null,
+    id: "", // Store ID for update
   });
 
   const [entries, setEntries] = useState([]);
@@ -28,6 +29,22 @@ const PettyCashManagement = () => {
     }
   };
 
+  const handleGenerateReport = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/pettycash/generate-report", { responseType: 'blob' });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'petty_cash_report.pdf';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error generating report:", err);
+      alert("Failed to generate report: " + (err.response ? err.response.data.message : err.message));
+    }
+  };
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewTransaction((prev) => ({ ...prev, [name]: value }));
@@ -86,14 +103,41 @@ const PettyCashManagement = () => {
         transactionDate: newTransaction.transactionDate.toISOString(),
       };
 
-      await axios.post("http://localhost:5000/api/pettycash/add", payload);
-      setSuccessMessage("Transaction added successfully!");
-      setNewTransaction({ amount: "", description: "", transactionDate: null });
+      if (newTransaction.id) {
+        // Update existing entry
+        await axios.put(`http://localhost:5000/api/pettycash/update/${newTransaction.id}`, payload);
+        setSuccessMessage("Transaction updated successfully!");
+      } else {
+        // Add new entry
+        await axios.post("http://localhost:5000/api/pettycash/add", payload);
+        setSuccessMessage("Transaction added successfully!");
+      }
+
+      setNewTransaction({ amount: "", description: "", transactionDate: null, id: "" });
       setErrors({});
       fetchEntries(); // refresh list
     } catch (err) {
-      setErrors({ submit: err.response?.data || "Failed to add transaction." });
+      setErrors({ submit: err.response?.data || "Failed to add/update transaction." });
     }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/pettycash/delete/${id}`);
+      setSuccessMessage("Transaction deleted successfully!");
+      fetchEntries(); // refresh list
+    } catch (err) {
+      setErrors({ submit: "Failed to delete transaction." });
+    }
+  };
+
+  const handleUpdate = (entry) => {
+    setNewTransaction({
+      amount: entry.amount,
+      description: entry.description,
+      transactionDate: new Date(entry.transactionDate),
+      id: entry._id,
+    });
   };
 
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-GB");
@@ -107,7 +151,7 @@ const PettyCashManagement = () => {
       <div className="col-md-8 mb-4">
         <div className="card">
           <div className="card-header bg-info text-white">
-            <h5>Add New Expense</h5>
+            <h5>{newTransaction.id ? "Update Expense" : "Add New Expense"}</h5>
           </div>
           <div className="card-body">
             <form onSubmit={handleSubmit}>
@@ -138,10 +182,10 @@ const PettyCashManagement = () => {
                   className="form-control"
                   required
                 />
-              </div>
+              </div><br />
 
               <div className="form-group">
-                <label>Date:</label>
+                <label>Date:</label> &nbsp;
                 <DatePicker
                   selected={newTransaction.transactionDate}
                   onChange={handleDateChange}
@@ -159,8 +203,8 @@ const PettyCashManagement = () => {
                 )}
               </div>
 
-              <button type="submit" className="btn btn-success mt-3">
-                <i className="fas fa-plus-circle"></i>&nbsp; Add Expense
+              <button type="submit" className="btn btn-success  mt-3">
+                <i className="fas fa-plus-circle"></i>&nbsp; {newTransaction.id ? "Update" : "Add"} Expense
               </button>
             </form>
           </div>
@@ -182,6 +226,7 @@ const PettyCashManagement = () => {
                   <th>Date</th>
                   <th>Description</th>
                   <th>Amount (LKR)</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -190,13 +235,39 @@ const PettyCashManagement = () => {
                     <td>{formatDate(entry.transactionDate)}</td>
                     <td>{entry.description}</td>
                     <td>{entry.amount.toFixed(2)}</td>
+                    <td>
+                      <button
+                        className="btn btn-warning btn-sm"
+                        onClick={() => handleUpdate(entry)}
+                      >
+                        Edit
+                      </button> &nbsp;
+                      <button
+                        className="btn btn-danger btn-sm ml-4"
+                        onClick={() => handleDelete(entry._id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
         </div>
+
+
       </div>
+
+      {/* Button to generate petty cash report */}
+        <div className="col-md-8 mb-4">
+          <button
+            className="btn btn-primary"
+            onClick={handleGenerateReport}
+          >
+            Generate Petty Cash Report
+          </button>
+        </div>
     </div>
   );
 };
