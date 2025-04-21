@@ -3,36 +3,47 @@ import PettyCash from '../models/PettyCash.js';
 
 const router = express.Router();
 
-// Add a new petty cash expense
+// Route to add a new petty cash entry
 router.post('/add', async (req, res) => {
   try {
-    const { description, amount } = req.body;
-    const newPettyCashEntry = new PettyCash({ description, amount });
-    await newPettyCashEntry.save();
+    const { description, amount, transactionDate } = req.body;
+
+    // Basic validation
+    if (!description || !amount || !transactionDate) {
+      return res.status(400).send("All fields are required.");
+    }
+
+    const amountNum = parseFloat(amount);
+    if (amountNum <= 0 || amountNum > 5000) {
+      return res.status(400).send("Amount must be greater than 0 and ≤ 5000.");
+    }
+
+    const date = new Date(transactionDate);
+    const today = new Date();
+    if (date > today) {
+      return res.status(400).send("Future dates are not allowed.");
+    }
+
+    const newEntry = new PettyCash({
+      description,
+      amount: amountNum,
+      transactionDate: date,
+    });
+
+    await newEntry.save();
     res.status(201).send('Petty Cash Entry Added');
   } catch (error) {
     res.status(500).send('Error adding petty cash entry: ' + error.message);
   }
 });
 
-// Get all petty cash expenses
+// Route to get all entries
 router.get('/', async (req, res) => {
   try {
-    const pettyCashEntries = await PettyCash.find().sort({ transactionDate: -1 });
-    res.json(pettyCashEntries);
+    const entries = await PettyCash.find().sort({ transactionDate: -1 });
+    res.json(entries);
   } catch (error) {
-    res.status(500).send('Error fetching petty cash entries: ' + error.message);
-  }
-});
-
-// Optional: Get summary of expenses
-router.get('/summary', async (req, res) => {
-  try {
-    const entries = await PettyCash.find();
-    const totalExpense = entries.reduce((sum, entry) => sum + entry.amount, 0);
-    res.json({ totalExpense });
-  } catch (error) {
-    res.status(500).send('Error calculating summary: ' + error.message);
+    res.status(500).send('Error fetching entries: ' + error.message);
   }
 });
 
