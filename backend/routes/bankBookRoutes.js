@@ -4,7 +4,8 @@ import express from "express";
 import {
     addTransaction,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    getAllTransactions
   } from "../controllers/bankBookController.js";
 
 const router = express.Router();
@@ -13,5 +14,6 @@ const router = express.Router();
 router.post("/add-transaction", addTransaction);
 router.put("/transaction/update/:transactionId", updateTransaction);
 router.delete("/transaction/delete/:transactionId", deleteTransaction);
+router.get("/transactions", getAllTransactions);
 
 export default router;

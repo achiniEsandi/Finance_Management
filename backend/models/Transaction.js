@@ -1,34 +1,12 @@
 import mongoose from 'mongoose';
 
+
 const transactionSchema = new mongoose.Schema({
-  source: {
-    type: String,
-    enum: ['manual', 'petty_cash'],
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  amount: {
-    type: Number,
-    required: true,
-  },
-  transactionType: {
-    type: String,
-    enum: ['credit', 'debit'],
-    required: true,
-  },
-  category: {
-    type: String,
-    default: 'General',
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-  }
-}, {
-  timestamps: true
+  type: { type: String, enum: ["income", "expense", "sales"], required: true },
+  description: { type: String },
+  amount: { type: Number, required: true },
+  timestamp: { type: Date, default: Date.now },
+  approved: { type: Boolean, default: false }
 });
 
-export default mongoose.model('Transaction', transactionSchema);
+export default mongoose.model("Transaction", transactionSchema);

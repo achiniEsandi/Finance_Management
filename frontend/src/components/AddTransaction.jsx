@@ -64,19 +64,28 @@ const AddTransaction = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (errorMessage) return;
-
+      
+        const payload = {
+          type: formData.type,
+          description: formData.description,
+          amount: parseFloat(formData.amount),
+          timestamp: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+          approved: false
+        };
+      
         try {
-            const response = await axios.post('http://localhost:5000/api/finance/add', formData);
-            if (response.status === 201) {
-                alert('Transaction added successfully!');
-                setFormData({ type: 'income', description: '', amount: '', date: '', specificDescription: '' });
-                fetchTransactions();
-            }
+          const response = await axios.post('http://localhost:5000/api/finance/add', payload);
+          if (response.status === 201) {
+            alert('Transaction added successfully!');
+            setFormData({ type: 'income', description: '', amount: '', date: '', specificDescription: '' });
+            fetchTransactions();
+          }
         } catch (error) {
-            console.error('Error adding transaction:', error);
-            alert('Server error. Please try again later.');
+          console.error('Error adding transaction:', error.response?.data || error.message);
+          alert('Server error. Please try again later.');
         }
-    };
+      };
+      
 
     // Handle transaction deletion
     const handleDelete = async (transactionId) => {

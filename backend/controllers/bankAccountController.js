@@ -79,4 +79,15 @@ export const updateBankAccount = async (req, res) => {
       res.status(500).json({ error: "Failed to delete account" });
     }
   };
+
+
+  export const getAllBankAccounts = async (req, res) => {
+    try {
+      const accounts = await BankAccount.find();
+      res.json(accounts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch bank accounts" });
+    }
+  };
+  
   

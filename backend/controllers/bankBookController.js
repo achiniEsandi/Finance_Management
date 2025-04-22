@@ -89,3 +89,13 @@ export const deleteTransaction = async (req, res) => {
     }
   };
   
+
+  export const getAllTransactions = async (req, res) => {
+    try {
+      const transactions = await Transaction.find();
+      res.json(transactions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch transactions" });
+    }
+  };
+  
