@@ -1,89 +1,77 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-export default function BalanceSheetList() {
-  const [sheets, setSheets] = useState([]);
+const BalanceSheetList = () => {
+  const [balanceSheets, setBalanceSheets] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/balance-sheet/all")
-      .then((res) => res.json())
-      .then((data) => setSheets(data))
-      .catch((err) => console.error("Error fetching balance sheets:", err));
+    axios.get('http://localhost:5000/api/balance-sheet/all')
+      .then(response => {
+        setBalanceSheets(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching balance sheets:', error);
+      });
   }, []);
 
-  const renderItems = (items = []) =>
-    items.length > 0 ? (
-      <ul className="list-disc pl-6 text-sm text-gray-700">
-        {items.map((item, i) => (
-          <li key={i}>
-            {item.name || "Unnamed"}: ${item.amount || 0}
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p className="text-sm text-gray-400">No data</p>
-    );
+  const handleDownload = async (id, description) => {
+    setLoading(true); // Start loading
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/balance-sheet/download/${id}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to download PDF');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${description.replace(/\s+/g, '_')}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+
+      setError(null); // Clear previous errors
+    } catch (error) {
+      console.error('Download error:', error);
+      setError('Failed to download PDF');
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">📄 Balance Sheets</h2>
-
-      {sheets.length === 0 ? (
-        <p className="text-gray-500">No records found.</p>
+    <div className="max-w-4xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-4 text-center">Balance Sheet List</h2>
+      {error && <p className="text-red-600 text-center">{error}</p>}
+      {balanceSheets.length === 0 ? (
+        <p className="text-center">No balance sheets available.</p>
       ) : (
-        sheets.map((sheet) => (
-          <div
-            key={sheet._id}
-            className="border rounded-lg p-5 bg-white shadow space-y-4"
-          >
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-blue-700">
-                {sheet.company || "Unnamed Company"}
-              </h3>
-              <p className="text-sm text-gray-500">📅 {sheet.date}</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Assets */}
+        <ul className="space-y-4">
+          {balanceSheets.map(sheet => (
+            <li key={sheet._id} className="bg-white p-4 shadow rounded flex justify-between items-center">
               <div>
-                <h4 className="text-md font-semibold text-gray-700 mb-2">
-                  Assets
-                </h4>
-                <div>
-                  <p className="font-medium text-gray-600">Current</p>
-                  {renderItems(sheet.assets?.current)}
-                </div>
-                <div className="mt-2">
-                  <p className="font-medium text-gray-600">Non-Current</p>
-                  {renderItems(sheet.assets?.nonCurrent)}
-                </div>
+                <h3 className="text-lg font-semibold">{sheet.description}</h3>
+                <p className="text-sm text-gray-500">{new Date(sheet.date).toLocaleDateString()}</p>
               </div>
-
-              {/* Liabilities */}
-              <div>
-                <h4 className="text-md font-semibold text-gray-700 mb-2">
-                  Liabilities
-                </h4>
-                <div>
-                  <p className="font-medium text-gray-600">Current</p>
-                  {renderItems(sheet.liabilities?.current)}
-                </div>
-                <div className="mt-2">
-                  <p className="font-medium text-gray-600">Non-Current</p>
-                  {renderItems(sheet.liabilities?.nonCurrent)}
-                </div>
-              </div>
-
-              {/* Equity */}
-              <div>
-                <h4 className="text-md font-semibold text-gray-700 mb-2">
-                  Equity
-                </h4>
-                {renderItems(sheet.equity)}
-              </div>
-            </div>
-          </div>
-        ))
+              <button
+                onClick={() => handleDownload(sheet._id, sheet.description)}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                disabled={loading} // Disable when loading
+              >
+                {loading ? 'Downloading...' : 'Download PDF'}
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
-}
+};
+
+export default BalanceSheetList;

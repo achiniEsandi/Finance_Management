@@ -7,6 +7,7 @@ import PaymentPortal from "./PaymentPortal";
 import PettyCashManagement from "./PettyCashManagement";
 import BalanceSheetForm from "./BalanceSheetForm";
 import BalanceSheetDetail from "./BalanceSheetDetail";
+import BalanceSheetList from "./BalanceSheetList";
 
 const FinanceDashboard = () => {
   const [reports, setReports] = useState(null);
@@ -89,7 +90,7 @@ const FinanceDashboard = () => {
             { label: "Dashboard", value: "dashboard", bg: "#213448" },
             { label: "Add Transaction", value: "add-transaction" },
             { label: "Add Balance Sheet", value: "add-balance-sheet" },
-            { label: "Balance Sheet Detail", value: "balance-sheet" },
+            { label: "Balance Sheet List", value: "balance-sheet" },
             { label: "Payment Portal", value: "payment-portal" },
             { label: "Petty Cash", value: "petty-cash" },
           ].map((tab) => (
@@ -150,7 +151,7 @@ const FinanceDashboard = () => {
 
         {activeTab === "add-transaction" && <AddTransaction />}
         {activeTab === "add-balance-sheet" && <BalanceSheetForm />}
-        {activeTab === "balance-sheet" && <BalanceSheetDetail />}
+        {activeTab === "balance-sheet" && <BalanceSheetList />}
         {activeTab === "payment-portal" && <PaymentPortal />}
         {activeTab === "petty-cash" && <PettyCashManagement />}
       </div>
