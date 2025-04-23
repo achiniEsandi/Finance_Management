@@ -77,86 +77,90 @@ export const deleteBalanceSheet = async (req, res) => {
 };
 
 // PDF generation logic
-export const generateBalanceSheetPDF = async (req, res) => {
-    try {
-        // Fetch balance sheets from database
-        const balanceSheets = await BalanceSheet.find();
+// 📌 Generate and Download Balance Sheet PDF
+export const downloadBalanceSheetPDF = async (req, res) => {
+  try {
+    const balanceSheets = await BalanceSheet.find();
 
-        if (balanceSheets.length === 0) {
-            return res.status(404).json({ message: "No balance sheets found" });
-        }
-
-        // Create a new PDF document
-        const doc = new PDFDocument();
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=balance-sheets.pdf');
-        doc.pipe(res);
-
-        // Add Logo
-        const logoPath = "images/logo.jpg"; // Adjust the path based on your project structure
-        doc.image(logoPath, 50, 50, { width: 100 }); 
-
-
-        // Add Letterhead
-        doc.fontSize(20).text("Cosmo Exports Lanka (PVT) LTD", 50, 120, { align: "center" });
-        doc.fontSize(12).text("496/1, Naduhena, Meegoda, Sri Lanka", { align: "center" });
-        doc.text("Phone: +94 77 086 4011  +94 11 275 2373 | Email: cosmoexportslanka@gmail.com", { align: "center" });
-        doc.moveDown(2);
-
-
-        doc.fontSize(18).text('Detailed Balance Sheet Report', { align: 'center' });
-        doc.moveDown();
-
-        balanceSheets.forEach((sheet, index) => {
-            doc.fontSize(14).text(`Balance Sheet #${index + 1}`, { underline: true });
-            doc.moveDown();
-
-            // Assets Breakdown
-            doc.fontSize(12).text('Assets', { underline: true });
-            doc.text('Current Assets:');
-            doc.text(`- Cash & Bank Balances: ${sheet.assets.currentAssets.cashBankBalances}`);
-            doc.text(`- Accounts Receivable: ${sheet.assets.currentAssets.accountsReceivable}`);
-            doc.text(`- Inventory: ${sheet.assets.currentAssets.inventory}`);
-            doc.text(`- Prepaid Expenses: ${sheet.assets.currentAssets.prepaidExpenses}`);
-            doc.moveDown();
-
-            doc.text('Non-Current Assets:');
-            doc.text(`- Property, Plant & Equipment: ${sheet.assets.nonCurrentAssets.propertyPlantEquipment}`);
-            doc.text(`- Machinery & Tools: ${sheet.assets.nonCurrentAssets.machineryTools}`);
-            doc.text(`- Vehicles: ${sheet.assets.nonCurrentAssets.vehicles}`);
-            doc.text(`- Intangible Assets: ${sheet.assets.nonCurrentAssets.intangibleAssets}`);
-            doc.moveDown();
-
-            // Liabilities Breakdown
-            doc.fontSize(12).text('Liabilities', { underline: true });
-            doc.text('Current Liabilities:');
-            doc.text(`- Accounts Payable: ${sheet.liabilities.currentLiabilities.accountsPayable}`);
-            doc.text(`- Short-Term Loans: ${sheet.liabilities.currentLiabilities.shortTermLoans}`);
-            doc.text(`- Taxes Payable: ${sheet.liabilities.currentLiabilities.taxesPayable}`);
-            doc.text(`- Wages Payable: ${sheet.liabilities.currentLiabilities.wagesPayable}`);
-            doc.moveDown();
-
-            doc.text('Non-Current Liabilities:');
-            doc.text(`- Long-Term Loans: ${sheet.liabilities.nonCurrentLiabilities.longTermLoans}`);
-            doc.text(`- Lease Obligations: ${sheet.liabilities.nonCurrentLiabilities.leaseObligations}`);
-            doc.text(`- Deferred Tax Liabilities: ${sheet.liabilities.nonCurrentLiabilities.deferredTaxLiabilities}`);
-            doc.moveDown();
-
-            // Equity Breakdown
-            doc.fontSize(12).text('Equity', { underline: true });
-            doc.text(`- Owner’s Capital: ${sheet.equity.ownersCapital}`);
-            doc.text(`- Retained Earnings: ${sheet.equity.retainedEarnings}`);
-            doc.text(`- Shareholder Contributions: ${sheet.equity.shareholderContributions}`);
-            doc.moveDown();
-        });
-
-        // End the PDF document
-        doc.end();
-    } catch (error) {
-        console.error("Error generating PDF:", error);
-        res.status(500).json({ message: '❌ Error generating PDF report', error });
+    if (!balanceSheets.length) {
+      return res.status(404).json({ message: "No balance sheets found" });
     }
+
+    const doc = new PDFDocument();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=balance-sheets.pdf');
+    doc.pipe(res);
+
+    // Add Company Branding
+    const logoPath = "images/logo.jpg";
+    doc.image(logoPath, 50, 50, { width: 100 });
+
+    doc.fontSize(20).text("Cosmo Exports Lanka (PVT) LTD", 50, 120, { align: "center" });
+    doc.fontSize(12).text("496/1, Naduhena, Meegoda, Sri Lanka", { align: "center" });
+    doc.text("Phone: +94 77 086 4011  +94 11 275 2373 | Email: cosmoexportslanka@gmail.com", { align: "center" });
+    doc.moveDown(2);
+
+    doc.fontSize(18).text("Detailed Balance Sheet Report", { align: "center" });
+    doc.moveDown();
+
+    balanceSheets.forEach((sheet, index) => {
+      doc.addPage(); // Add new page for each sheet if needed
+      doc.fontSize(14).text(`Balance Sheet #${index + 1}`, { underline: true });
+      doc.moveDown();
+
+      // Assets
+      doc.fontSize(12).text("Assets", { underline: true });
+      doc.text("Current Assets:");
+      const ca = sheet.assets.currentAssets || {};
+      doc.text(`- Cash & Bank Balances: ${ca.cashBankBalances}`);
+      doc.text(`- Accounts Receivable: ${ca.accountsReceivable}`);
+      doc.text(`- Inventory: ${ca.inventory}`);
+      doc.text(`- Prepaid Expenses: ${ca.prepaidExpenses}`);
+      doc.moveDown();
+
+      doc.text("Non-Current Assets:");
+      const nca = sheet.assets.nonCurrentAssets || {};
+      doc.text(`- Property, Plant & Equipment: ${nca.propertyPlantEquipment}`);
+      doc.text(`- Machinery & Tools: ${nca.machineryTools}`);
+      doc.text(`- Vehicles: ${nca.vehicles}`);
+      doc.text(`- Intangible Assets: ${nca.intangibleAssets}`);
+      doc.moveDown();
+
+      // Liabilities
+      doc.fontSize(12).text("Liabilities", { underline: true });
+      doc.text("Current Liabilities:");
+      const cl = sheet.liabilities.currentLiabilities || {};
+      doc.text(`- Accounts Payable: ${cl.accountsPayable}`);
+      doc.text(`- Short-Term Loans: ${cl.shortTermLoans}`);
+      doc.text(`- Taxes Payable: ${cl.taxesPayable}`);
+      doc.text(`- Wages Payable: ${cl.wagesPayable}`);
+      doc.moveDown();
+
+      doc.text("Non-Current Liabilities:");
+      const ncl = sheet.liabilities.nonCurrentLiabilities || {};
+      doc.text(`- Long-Term Loans: ${ncl.longTermLoans}`);
+      doc.text(`- Lease Obligations: ${ncl.leaseObligations}`);
+      doc.text(`- Deferred Tax Liabilities: ${ncl.deferredTaxLiabilities}`);
+      doc.moveDown();
+
+      // Equity
+      doc.fontSize(12).text("Equity", { underline: true });
+      const eq = sheet.equity || {};
+      doc.text(`- Owner’s Capital: ${eq.ownersCapital}`);
+      doc.text(`- Retained Earnings: ${eq.retainedEarnings}`);
+      doc.text(`- Shareholder Contributions: ${eq.shareholderContributions}`);
+      doc.moveDown();
+    });
+
+    doc.end();
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    res.status(500).json({ message: "❌ Error generating PDF report", error });
+  }
 };
+
+
+
 
 
 // 📌 Get Balance Sheet by ID
