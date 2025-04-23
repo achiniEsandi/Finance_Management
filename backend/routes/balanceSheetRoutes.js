@@ -6,6 +6,7 @@ import {
   deleteBalanceSheet,
   getBalanceSheetById,
   downloadBalanceSheetPDF,
+  downloadBalanceSheetByIdPDF,
 } from "../controllers/balanceSheetController.js";
 
 
@@ -28,9 +29,9 @@ router.put("/update/:id", updateBalanceSheet);
 // 📌 Delete Balance Sheet by ID
 router.delete("/delete/:id", deleteBalanceSheet);
 
+router.get('/download/:id', downloadBalanceSheetByIdPDF);
 
-
-// GET /api/balance-sheet/download/:id
-router.get("/download/:id", downloadBalanceSheetPDF);
+// GET /api/balance-sheet/download/all
+router.get('/download/all', downloadBalanceSheetPDF);
 
 export default router;
