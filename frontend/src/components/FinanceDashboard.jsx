@@ -83,7 +83,7 @@ const FinanceDashboard = () => {
         >
           ⬅ Back to Admin Dashboard
         </button>
-
+        <br></br> &nbsp;
         {/* Navigation Buttons */}
         <div className="flex flex-wrap gap-4 mb-6">
           {[

@@ -45,6 +45,25 @@ const BalanceSheetList = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    setLoading(true); // Start loading
+
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/balance-sheet/delete/${id}`);
+
+      if (response.status === 200) {
+        // Remove deleted balance sheet from state
+        setBalanceSheets(prevSheets => prevSheets.filter(sheet => sheet._id !== id));
+        setError(null); // Clear any previous errors
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      setError('Failed to delete balance sheet');
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4 text-center">Balance Sheet List</h2>
@@ -59,13 +78,22 @@ const BalanceSheetList = () => {
                 <h3 className="text-lg font-semibold">{sheet.description}</h3>
                 <p className="text-sm text-gray-500">{new Date(sheet.date).toLocaleDateString()}</p>
               </div>
-              <button
-                onClick={() => handleDownload(sheet._id, sheet.description)}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                disabled={loading} // Disable when loading
-              >
-                {loading ? 'Downloading...' : 'Download PDF'}
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handleDownload(sheet._id, sheet.description)}
+                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                  disabled={loading} // Disable when loading
+                >
+                  {loading ? 'Downloading...' : 'Download PDF'}
+                </button> &nbsp; &nbsp;
+                <button
+                  onClick={() => handleDelete(sheet._id)}
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                  disabled={loading} // Disable when loading
+                >
+                  {loading ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
             </li>
           ))}
         </ul>

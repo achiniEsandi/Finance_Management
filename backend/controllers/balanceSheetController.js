@@ -70,22 +70,26 @@ export const updateBalanceSheet = async (req, res) => {
   }
 };
 
+
 // 📌 Delete Balance Sheet by ID
 export const deleteBalanceSheet = async (req, res) => {
   try {
     const { id } = req.params;
+    const sheet = await BalanceSheet.findById(id);
 
-    const deletedBalanceSheet = await BalanceSheet.findByIdAndDelete(id);
-
-    if (!deletedBalanceSheet) {
-      return res.status(404).json({ message: "❌ Balance Sheet Not Found" });
+    if (!sheet) {
+      return res.status(404).json({ message: "❌ Balance Sheet not found" });
     }
 
-    res.status(200).json({ message: "✅ Balance Sheet Deleted", deletedBalanceSheet });
+    await BalanceSheet.findByIdAndDelete(id); // Deleting the balance sheet
+
+    res.status(200).json({ message: "✅ Balance Sheet deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "❌ Error Deleting Balance Sheet", error: error.message });
+    console.error("Error deleting balance sheet:", error);
+    res.status(500).json({ message: "❌ Error deleting balance sheet", error: error.message });
   }
 };
+
 
 // 📌 Generate and Download Balance Sheet PDF
 export const downloadBalanceSheetPDF = async (req, res) => {
