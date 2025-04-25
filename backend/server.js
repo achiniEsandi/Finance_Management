@@ -14,6 +14,7 @@ import quotationRoutes from './routes/quotationRoutes.js';
 import appointmentRoutes from "./routes/appointmentRoutes.js";
 import bankAccountRoutes from './routes/bankAccountRoutes.js';
 import profitLossRouter from './routes/profitLossRoutes.js';
+import pdfRoutes from "./routes/pdfRoutes.js";
 //import transactionRoutes from './routes/transactionRoutes.js'
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.use('/api/salary', salaryRoutes);
 app.use('/api/quotations', quotationRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use('/api/profit-loss', profitLossRouter);
+app.use("/api/pdf", pdfRoutes);
 
 //app.use("/api/transactions", transactionRoutes);
 

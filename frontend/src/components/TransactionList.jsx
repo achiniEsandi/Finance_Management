@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const TransactionList = () => {
+const TransactionList = ({ accountId }) => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/bank-book/add-transaction")
-      .then((res) => setTransactions(res.data))
-      .catch((err) => console.error("Error fetching transactions:", err));
-  }, []);
+    const fetchTxs = async () => {
+      const res = await axios.get("/api/bank-book/transactions");
+      setTransactions(res.data.filter((tx) => tx.bank_account_id === accountId));
+    };
+    fetchTxs();
+  }, [accountId]);
 
   return (
-    <div>
-      <h3>Transactions</h3>
-      <ul className="list-group">
-        {transactions.map((txn) => (
-          <li key={txn._id} className="list-group-item">
-            <strong>{txn.transaction_type.toUpperCase()}</strong>: ${txn.amount} – {txn.description}
-            <div><small>Date: {new Date(txn.transactionDate).toLocaleString()}</small></div>
+    <div className="mt-6">
+      <h3 className="font-bold">Transaction History</h3>
+      <ul className="divide-y">
+        {transactions.map((tx) => (
+          <li key={tx._id} className="py-2">
+            <strong>{tx.transaction_type.toUpperCase()}</strong> ₹{tx.amount} – {tx.description} <br />
+            Balance: ₹{tx.current_balance} on {new Date(tx.transactionDate).toLocaleDateString()}
           </li>
         ))}
       </ul>

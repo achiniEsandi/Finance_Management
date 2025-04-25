@@ -1,60 +1,29 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const BankAccountForm = () => {
-  const [formData, setFormData] = useState({
-    bankName: "",
-    accountNumber: "",
-    balance: "",
-  });
+const BankAccountForm = ({ onAccountAdded }) => {
+  const [form, setForm] = useState({ bankName: "", accountNumber: "", initialBalance: "" });
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await axios.post("http://localhost:5000/api/bank-account/create", formData);
-      alert("Bank account created!");
-    } catch (err) {
-      console.error("Error creating account:", err);
-      alert("Failed to create account.");
-    }
+    await axios.post("/api/bank-account/create", {
+      ...form,
+      initialBalance: parseFloat(form.initialBalance),
+    });
+    setForm({ bankName: "", accountNumber: "", initialBalance: "" });
+    onAccountAdded();
   };
 
   return (
-    <div>
-      <h3>Create Bank Account</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-2">
-          <label>Bank Name</label>
-          <input
-            type="text"
-            className="form-control"
-            value={formData.bankName}
-            onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-          />
-        </div>
-        <div className="mb-2">
-          <label>Account Number</label>
-          <input
-            type="text"
-            className="form-control"
-            value={formData.accountNumber}
-            onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-          />
-        </div>
-        <div className="mb-2">
-          <label>Initial Balance</label>
-          <input
-            type="number"
-            className="form-control"
-            value={formData.balance}
-            onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
-          />
-        </div>
-        <button className="btn btn-success" type="submit">
-          Create Account
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <h3 className="font-bold">Add Bank Account</h3>
+      <input name="bankName" placeholder="Bank Name" onChange={handleChange} value={form.bankName} className="input" />
+      <input name="accountNumber" placeholder="Account Number" onChange={handleChange} value={form.accountNumber} className="input" />
+      <input name="initialBalance" type="number" placeholder="Initial Balance" onChange={handleChange} value={form.initialBalance} className="input" />
+      <button type="submit" className="btn">Add Account</button>
+    </form>
   );
 };
 

@@ -4,7 +4,6 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 // Existing imports
 import FinanceDashboard from "./components/FinanceDashboard";
-import BalanceSheetPage from "./components/BalanceSheetPage";
 import BalanceSheetForm from "./components/BalanceSheetForm";
 import BalanceSheetList from "./components/BalanceSheetList";
 import BalanceSheetDetail from "./components/BalanceSheetDetail";
@@ -20,6 +19,8 @@ import QuotationHistory from "./pages/QuotationHistory";
 // New Bank Book Components
 import BankAccounts from "./pages/BankAccounts";
 import Transactions from "./pages/Transactions";
+import BankBookDashboard from "./pages/BankBookDashboard";
+//import Dashboard from "./components/Dashboard";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <h3 className="mb-4">Admin Panel</h3>
           <div className="list-group">
             <Link to="/finance-dashboard" className="list-group-item list-group-item-action text-dark">Finance Dashboard</Link>
+            <Link to="/finance-dashboard/bank-book" className="list-group-item list-group-item-action text-dark">Bank Book Dashboard</Link>
             <Link to="/finance-dashboard/bank-accounts" className="list-group-item list-group-item-action text-dark">Bank Accounts</Link>
             <Link to="/finance-dashboard/bank-transactions" className="list-group-item list-group-item-action text-dark">Bank Transactions</Link>
             <Link to="/employee-dashboard" className="list-group-item list-group-item-action text-dark">Employee Dashboard</Link>
@@ -51,10 +53,13 @@ function App() {
             <Route path="/finance-dashboard/add-transaction" element={<AddTransaction />} />
             <Route path="/finance-dashboard/payment-portal" element={<PaymentPortal />} />
             <Route path="/finance-dashboard/petty-cash" element={<PettyCashManagement />} />
+
             
             {/* Bank Book Management */}
             <Route path="/finance-dashboard/bank-accounts" element={<BankAccounts />} />
             <Route path="/finance-dashboard/bank-transactions" element={<Transactions />} />
+            <Route path="/finance-dashboard/bank-book" element={<BankBookDashboard />} />
+
 
             {/* Balance Sheet Routes */}
             <Route path="/finance-dashboard/balance-sheet" element={<BalanceSheetForm />} />
