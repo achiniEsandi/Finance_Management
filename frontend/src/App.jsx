@@ -68,7 +68,7 @@ function App() {
             {/* Other Dashboards */}
             <Route path="/employee-dashboard" element={<h2>Employee Dashboard (Coming Soon)</h2>} />
             <Route path="/quotation-dashboard" element={<QuotationDashboard />} />
-            <Route path="/repair-dashboard" element={<h2>Repair Dashboard (Coming Soon)</h2>} />
+            <Route path="/RepairadminDash" element={<h2>Repair Dashboard (Coming Soon)</h2>} />
             <Route path="/inventory-dashboard" element={<h2>Inventory Dashboard (Coming Soon)</h2>} />
             <Route path="/appointment-dashboard" element={<h2>Service Appointment Dashboard (Coming Soon)</h2>} />
 
