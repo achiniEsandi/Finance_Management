@@ -87,12 +87,15 @@ const FinanceDashboard = () => {
         {/* Navigation Buttons */}
         <div className="flex flex-wrap gap-4 mb-6">
           {[
-            { label: "Dashboard", value: "dashboard", bg: "#213448" },
-            { label: "Add Transaction", value: "add-transaction" },
-            { label: "Add Balance Sheet", value: "add-balance-sheet" },
+            { label: "Dashboard", value: "dashboard", bg: "#657C6A" },
+            { label: "Transaction Management", value: "add-transaction" },
+            { label: "Bank book Management", value: "bank-book" },
+            { label: "Petty Cash Management", value: "petty-cash" },
+            { label: "Balance Sheet Management", value: "add-balance-sheet" },
             { label: "Balance Sheet List", value: "balance-sheet" },
+            { label: "Profit & Loss Statement", value: "petty-cash" },
             { label: "Payment Portal", value: "payment-portal" },
-            { label: "Petty Cash", value: "petty-cash" },
+            
           ].map((tab) => (
             <button
               key={tab.value}
@@ -150,10 +153,11 @@ const FinanceDashboard = () => {
         )}
 
         {activeTab === "add-transaction" && <AddTransaction />}
+        {activeTab === "bank-book" && <BalanceSheetDetail />}
+        {activeTab === "petty-cash" && <PettyCashManagement />}
         {activeTab === "add-balance-sheet" && <BalanceSheetForm />}
         {activeTab === "balance-sheet" && <BalanceSheetList />}
         {activeTab === "payment-portal" && <PaymentPortal />}
-        {activeTab === "petty-cash" && <PettyCashManagement />}
       </div>
     </div>
   );
