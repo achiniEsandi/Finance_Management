@@ -8,6 +8,7 @@ import PettyCashManagement from "./PettyCashManagement";
 import BalanceSheetForm from "./BalanceSheetForm";
 import BalanceSheetDetail from "./BalanceSheetDetail";
 import BalanceSheetList from "./BalanceSheetList";
+import ProfitLossManagement from "./ProfitLossManagement";
 
 const FinanceDashboard = () => {
   const [reports, setReports] = useState(null);
@@ -93,7 +94,7 @@ const FinanceDashboard = () => {
             { label: "Petty Cash Management", value: "petty-cash" },
             { label: "Balance Sheet Management", value: "add-balance-sheet" },
             { label: "Balance Sheet List", value: "balance-sheet" },
-            { label: "Profit & Loss Statement", value: "petty-cash" },
+            { label: "Profit & Loss Statement", value: "profit-loss" },
             { label: "Payment Portal", value: "payment-portal" },
             
           ].map((tab) => (
@@ -158,6 +159,7 @@ const FinanceDashboard = () => {
         {activeTab === "add-balance-sheet" && <BalanceSheetForm />}
         {activeTab === "balance-sheet" && <BalanceSheetList />}
         {activeTab === "payment-portal" && <PaymentPortal />}
+        {activeTab === "profit-loss" && <ProfitLossManagement />}
       </div>
     </div>
   );
