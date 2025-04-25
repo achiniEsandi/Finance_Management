@@ -18,11 +18,11 @@ export default function ProfitLossManagement() {
   // Today's date in YYYY-MM-DD format for default and max validation
   const today = new Date().toISOString().slice(0, 10);
 
-  const [entries, setEntries] = useState([]);
-  // Initialize form with today's date
-  const [form, setForm]       = useState({ ...emptyEntry, date: today });
-  const [editingId, setEditingId] = useState(null);
-  const [summary, setSummary] = useState(null);
+  const [entries, setEntries]       = useState([]);
+  const [form, setForm]             = useState({ ...emptyEntry, date: today });
+  const [editingId, setEditingId]   = useState(null);
+  const [summary, setSummary]       = useState(null);
+
 
   // Helpers to load data
   const fetchEntries = async () => {
@@ -41,6 +41,42 @@ export default function ProfitLossManagement() {
     fetchSummary();
   }, []);
 
+  // New: download full report from backend
+  const downloadFullReport = async () => {
+    const url = `${baseUrl}/generate-report`;
+    console.log('Downloading P&L from:', url);
+    try {
+      const res = await axios.get(url, {
+        responseType: 'blob',
+        headers: { Accept: 'application/pdf' }
+      });
+      console.log('Got blob:', res.data, res.headers['content-type']);
+  
+      // create a Blob URL
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'profit_loss_report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      // More detailed error logging:
+      if (err.response) {
+        console.error('Status:', err.response.status);
+        console.error('Data:', err.response.data);
+      } else {
+        console.error(err);
+      }
+      alert(
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to download report.'
+      );
+    }
+  };
+  
   // PDF generation
   const generatePDF = (entry) => {
     const doc = new jsPDF();
@@ -171,7 +207,7 @@ export default function ProfitLossManagement() {
                     <td className="p-2 space-x-2">
                       <button onClick={()=>startEdit(e)} className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">Edit</button>
                       <button onClick={()=>handleDelete(e._id)} className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
-                      <button onClick={()=>generatePDF(e)} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Download PDF</button>
+                      <button onClick={()=>downloadFullReport(e)} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Download PDF</button>
                     </td>
                   </tr>
                 ))}

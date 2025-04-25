@@ -30,7 +30,6 @@ function App() {
           <h3 className="mb-4">Admin Panel</h3>
           <div className="list-group">
             <Link to="/finance-dashboard" className="list-group-item list-group-item-action text-dark">Finance Dashboard</Link>
-            <Link to="/finance-dashboard/balance-sheet" className="list-group-item list-group-item-action text-dark">Balance Sheet Management</Link>
             <Link to="/finance-dashboard/bank-accounts" className="list-group-item list-group-item-action text-dark">Bank Accounts</Link>
             <Link to="/finance-dashboard/bank-transactions" className="list-group-item list-group-item-action text-dark">Bank Transactions</Link>
             <Link to="/employee-dashboard" className="list-group-item list-group-item-action text-dark">Employee Dashboard</Link>
