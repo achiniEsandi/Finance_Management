@@ -9,6 +9,7 @@ import BalanceSheetForm from "./BalanceSheetForm";
 import BalanceSheetDetail from "./BalanceSheetDetail";
 import BalanceSheetList from "./BalanceSheetList";
 import ProfitLossManagement from "./ProfitLossManagement";
+import BankBookDashboard from "../pages/BankBookDashboard";
 
 const FinanceDashboard = () => {
   const [reports, setReports] = useState(null);
@@ -154,7 +155,7 @@ const FinanceDashboard = () => {
         )}
 
         {activeTab === "add-transaction" && <AddTransaction />}
-        {activeTab === "bank-book" && <BalanceSheetDetail />}
+        {activeTab === "bank-book" && <BankBookDashboard />}
         {activeTab === "petty-cash" && <PettyCashManagement />}
         {activeTab === "add-balance-sheet" && <BalanceSheetForm />}
         {activeTab === "balance-sheet" && <BalanceSheetList />}
