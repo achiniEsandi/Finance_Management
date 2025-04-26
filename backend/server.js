@@ -34,7 +34,7 @@ app.use('/api/salary', salaryRoutes);
 app.use('/api/quotations', quotationRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use('/api/profit-loss', profitLossRouter);
-app.use("/api/pdf", pdfRoutes);
+app.use("/api/pdf", pdfRoutes);  //for bank statement pdf generation
 
 //app.use("/api/transactions", transactionRoutes);
 
