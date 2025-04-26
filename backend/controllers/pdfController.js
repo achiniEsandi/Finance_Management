@@ -7,8 +7,19 @@ import BankAccount from "../models/BankAccount.js";
 export const generateBankStatementPDF = async (req, res) => {
   try {
     const { accountId } = req.params;
+    
+    // Fetch account with error handling
     const account = await BankAccount.findById(accountId);
-    const transactions = await BankBookTransaction.find({ bank_account_id: accountId }).sort({ createdAt: 1 });
+    if (!account) {
+      throw new Error('Bank account not found');
+    }
+
+    // Fetch all transactions for this account
+    const transactions = await BankBookTransaction.find({ 
+      bank_account_id: accountId 
+    }).sort({ createdAt: -1 }); // newest first
+
+    console.log('Found transactions:', transactions.length);
 
     const doc = new PDFDocument({ margin: 40 });
     res.setHeader('Content-Disposition', 'attachment; filename="bank_statement.pdf"');
@@ -60,30 +71,78 @@ export const generateBankStatementPDF = async (req, res) => {
 
     // Table Rows
     let y = doc.y + 2;
-    transactions.forEach(tx => {
+    let runningBalance = account.balance;
+    
+    // Sort transactions in reverse chronological order
+    const sortedTransactions = [...transactions].sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    sortedTransactions.forEach(tx => {
+      // Debug log for transaction
+      console.log('Processing transaction:', {
+        id: tx._id,
+        type: tx.transaction_type,
+        amount: tx.amount,
+        balance: tx.current_balance
+      });
+
       let debit = '', credit = '';
-      if (['withdrawal', 'bank_charge'].includes(tx.transaction_type)) {
-        debit = tx.amount;
-      } else {
-        credit = tx.amount;
+      const formattedAmount = parseFloat(tx.amount).toFixed(2);
+      
+      // Explicitly handle each transaction type
+      switch(tx.transaction_type) {
+        case 'withdrawal':
+        case 'bank_charge':
+          debit = formattedAmount;
+          credit = '';
+          break;
+        case 'deposit':
+        case 'unknown_deposit':
+          debit = '';
+          credit = formattedAmount;
+          break;
+        default:
+          console.log('Unknown transaction type:', tx.transaction_type);
       }
+      
       x = doc.x;
       const txnDate = tx.createdAt ? new Date(tx.createdAt) : null;
-      const txnDateStr = txnDate && !isNaN(txnDate) ? txnDate.toLocaleDateString() : '';
+      const txnDateStr = txnDate && !isNaN(txnDate) ? 
+        txnDate.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: '2-digit', 
+          day: '2-digit' 
+        }) : '';
+      
+      // Transaction description based on type
+      const description = tx.description || 
+        (tx.transaction_type === 'deposit' ? 'Cash Deposit' :
+         tx.transaction_type === 'withdrawal' ? 'Cash Withdrawal' :
+         tx.transaction_type === 'bank_charge' ? 'Bank Charge' :
+         tx.transaction_type === 'unknown_deposit' ? 'Unknown Deposit' : '');
+      
+      // Write row data
       doc.text(txnDateStr, x, y, { width: colWidths[0] });
       x += colWidths[0];
       doc.text(txnDateStr, x, y, { width: colWidths[1] });
       x += colWidths[1];
-      doc.text(tx.description || '', x, y, { width: colWidths[2] });
+      doc.text(description, x, y, { width: colWidths[2] });
       x += colWidths[2];
-      doc.text('_________', x, y, { width: colWidths[3] });
+      doc.text(tx._id.toString().slice(-6), x, y, { width: colWidths[3] }); // Use last 6 chars of transaction ID as reference
       x += colWidths[3];
-      doc.text(debit ? debit.toString() : '', x, y, { width: colWidths[4] });
+      doc.text(debit, x, y, { width: colWidths[4], align: 'right' });
       x += colWidths[4];
-      doc.text(credit ? credit.toString() : '', x, y, { width: colWidths[5] });
+      doc.text(credit, x, y, { width: colWidths[5], align: 'right' });
       x += colWidths[5];
-      doc.text(tx.current_balance.toString(), x, y, { width: colWidths[6] });
-      y += 18;
+      doc.text(parseFloat(tx.current_balance).toFixed(2), x, y, { width: colWidths[6], align: 'right' });
+      
+      // Add a line between transactions
+      y += 20;
+      if (y > doc.page.height - 100) {  // Check if we need a new page
+        doc.addPage();
+        y = 50;  // Reset Y position on new page
+      }
     });
     doc.moveDown(2);
 

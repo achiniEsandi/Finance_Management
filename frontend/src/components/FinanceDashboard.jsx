@@ -91,7 +91,7 @@ const FinanceDashboard = () => {
           {[
             { label: "Dashboard", value: "dashboard", bg: "#657C6A" },
             { label: "Transaction Management", value: "add-transaction" },
-            { label: "Bank book Management", value: "bank-book" },
+            { label: "Bank Book Management", value: "bank-book", path: "/finance-dashboard/bank-book" },
             { label: "Petty Cash Management", value: "petty-cash" },
             { label: "Balance Sheet Management", value: "add-balance-sheet" },
             { label: "Balance Sheet List", value: "balance-sheet" },
@@ -108,7 +108,7 @@ const FinanceDashboard = () => {
                   ? `bg-[${tab.bg}]`
                   : "bg-blue-500"
               }`}
-              onClick={() => setActiveTab(tab.value)}
+              onClick={() => tab.path ? navigate(tab.path) : setActiveTab(tab.value)}
             >
               {tab.label}
             </button>
@@ -155,7 +155,7 @@ const FinanceDashboard = () => {
         )}
 
         {activeTab === "add-transaction" && <AddTransaction />}
-        {activeTab === "bank-book" && <BankBookDashboard />}
+        {/* Bank Book is now handled by router navigation */}
         {activeTab === "petty-cash" && <PettyCashManagement />}
         {activeTab === "add-balance-sheet" && <BalanceSheetForm />}
         {activeTab === "balance-sheet" && <BalanceSheetList />}
