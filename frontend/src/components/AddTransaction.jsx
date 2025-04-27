@@ -39,6 +39,14 @@ const AddTransaction = () => {
 
     // Handle form input changes
     const handleChange = (e) => {
+        if (e.target.name === 'amount') {
+            const value = parseFloat(e.target.value);
+            if (value < 0) {
+                setErrorMessage('Amount cannot be negative');
+                return;
+            }
+            setErrorMessage('');
+        }
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -210,6 +218,8 @@ const AddTransaction = () => {
                     placeholder="Amount (LKR)"
                     value={formData.amount}
                     onChange={handleChange}
+                    min="0"
+                    step="0.01"
                     required
                     className="w-full p-3 border rounded-md shadow-sm"
                 />
