@@ -1,4 +1,5 @@
 //for bank book management
+import fs from 'fs';
 
 import PDFDocument from "pdfkit";
 import BankBookTransaction from "../models/BankBookTransaction.js";
@@ -25,6 +26,12 @@ export const generateBankStatementPDF = async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename="bank_statement.pdf"');
     res.setHeader('Content-Type', 'application/pdf');
     doc.pipe(res);
+
+    // Logo
+        const logoPath = "images/logo.jpg"; // Adjust this if needed
+        if (fs.existsSync(logoPath)) {
+          doc.image(logoPath, 50, 50, { width: 100 });
+        }
 
     // BANK STATEMENT TITLE
     doc.fontSize(20).text("Cosmo Exports Lanka (PVT) LTD", 50, 120, { align: "center" });
