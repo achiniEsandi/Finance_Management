@@ -89,11 +89,33 @@ const AddTransaction = () => {
             return;
         }
       
+        // Handle timestamp creation
+        let timestamp;
+        if (!formData.date) {
+            timestamp = new Date().toISOString();
+        } else {
+            const selectedDate = new Date(formData.date);
+            const today = new Date();
+            
+            // Check if selected date is today
+            const isToday = selectedDate.getDate() === today.getDate() &&
+                           selectedDate.getMonth() === today.getMonth() &&
+                           selectedDate.getFullYear() === today.getFullYear();
+
+            if (isToday) {
+                timestamp = new Date().toISOString(); // Use current time for today
+            } else {
+                // Set time to midnight (12 AM) for other dates
+                selectedDate.setHours(0, 0, 0, 0);
+                timestamp = selectedDate.toISOString();
+            }
+        }
+
         const payload = {
           type: formData.type,
           description: formData.type === 'other' ? formData.specificDescription : formData.description,
           amount: parseFloat(formData.amount),
-          timestamp: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+          timestamp: timestamp,
           approved: false
         };
       
