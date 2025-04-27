@@ -62,7 +62,7 @@ const AddTransaction = () => {
         }));
     };
 
-    // Apply filters
+    // Apply filters and sort
     const applyFilters = () => {
         let filtered = [...transactions];
 
@@ -93,6 +93,9 @@ const AddTransaction = () => {
                 txn.description.toLowerCase().includes(searchFilters.description.toLowerCase())
             );
         }
+
+        // Sort by date in ascending order
+        filtered.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         setFilteredTransactions(filtered);
     };
