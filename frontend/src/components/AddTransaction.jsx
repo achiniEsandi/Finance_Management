@@ -72,10 +72,26 @@ const AddTransaction = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (errorMessage) return;
+
+        // Validate all required fields
+        const requiredFields = ['type', 'amount', 'date'];
+        const emptyFields = requiredFields.filter(field => !formData[field]);
+        
+        // Check if description is required
+        if (formData.type === 'other' && !formData.specificDescription) {
+            emptyFields.push('specificDescription');
+        } else if (formData.type !== 'other' && !formData.description) {
+            emptyFields.push('description');
+        }
+
+        if (emptyFields.length > 0) {
+            setErrorMessage(`Please fill in all required fields: ${emptyFields.join(', ')}`);
+            return;
+        }
       
         const payload = {
           type: formData.type,
-          description: formData.description,
+          description: formData.type === 'other' ? formData.specificDescription : formData.description,
           amount: parseFloat(formData.amount),
           timestamp: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
           approved: false
@@ -84,8 +100,9 @@ const AddTransaction = () => {
         try {
           const response = await axios.post('http://localhost:5000/api/finance/add', payload);
           if (response.status === 201) {
+            setErrorMessage('');
             alert('Transaction added successfully!');
-            setFormData({ type: 'income', description: '', amount: '', date: '', specificDescription: '' });
+            setFormData({ type: 'income', description: '', amount: '', date: null, specificDescription: '' });
             fetchTransactions();
           }
         } catch (error) {
