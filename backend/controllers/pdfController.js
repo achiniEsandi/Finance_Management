@@ -57,7 +57,7 @@ export const generateBankStatementPDF = async (req, res) => {
 
     // Account Statement
     doc.fontSize(12).fillColor('black').text('ACCOUNT STATEMENT',{ underline: true });
-    doc.moveDown(3);
+    doc.moveDown(2);
 
     // Table Header
     const tableTop = doc.y;
