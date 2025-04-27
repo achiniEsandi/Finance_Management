@@ -103,7 +103,21 @@ const PettyCashManagement = () => {
     }
     if (Object.keys(errors).length) return;
     try {
-      const payload = { ...newTransaction, transactionDate: newTransaction.transactionDate.toISOString() };
+      // Create a new date with today's time if the selected date is today
+    let transactionDateTime;
+    const selectedDate = new Date(newTransaction.transactionDate);
+    const today = new Date();
+    
+    if (selectedDate.toDateString() === today.toDateString()) {
+      // If the selected date is today, use the current time
+      transactionDateTime = new Date();
+    } else {
+      // If it's a past date, set time to start of that day
+      transactionDateTime = selectedDate;
+      transactionDateTime.setHours(0, 0, 0, 0);
+    }
+    
+    const payload = { ...newTransaction, transactionDate: transactionDateTime.toISOString() };
       if (newTransaction.id) {
         await axios.put(`http://localhost:5000/api/pettycash/update/${newTransaction.id}`, payload);
         setSuccessMessage("Transaction updated successfully!");
